@@ -24,7 +24,7 @@
 			</div>
 			<div class="modal-body">
 				<div class="float-right">
-					<img src="../templates/Yeelight/img/YeelightLogo.jpg"  width="58">
+					<img src="<#ROOTHTML#>templates/Yeelight/img/YeelightLogo.jpg"  width="58">
 					<br><br><p><b>v.0.1</b></p>
 				</div>
                 <p class="float-left">
@@ -61,7 +61,7 @@
 <!-- конец кнопка about-->
 
 <div>
-	<img src="../templates/Yeelight/img/YeelightLogo.jpg"  width="120" height="120">
+	<img src="<#ROOTHTML#>templates/Yeelight/img/YeelightLogo.jpg"  width="120" height="120">
 	&nbsp;&nbsp;&nbsp;
 	&nbsp;&nbsp;&nbsp;
 </div>
@@ -76,7 +76,7 @@
 
 [#if RESULT==""#]
 	<h4><#LANG_YE_APP_NOTFOUND#></h4><br><br><br>
-        <center><img src="../templates/Yeelight/img/NoResults.svg" alt="<#LANG_YE_APP_NOTFOUND#>"></center>
+        <center><img src="<#ROOTHTML#>templates/Yeelight/img/NoResults.svg" alt="<#LANG_YE_APP_NOTFOUND#>"></center>
 	[#else#]
 	<fieldset>
 	<div class="form-group">
@@ -89,7 +89,7 @@
 	[#begin RESULT#]
 	 <tr>
 	   <td valign="top">
-	   <img src="../templates/Yeelight/img/small/[#MODEL#].png" height="40px">
+	   <img src="<#ROOTHTML#>templates/Yeelight/img/small/[#MODEL#].png" height="40px">
 	   [#MODEL#]
 	   </td>
 	   <td>
