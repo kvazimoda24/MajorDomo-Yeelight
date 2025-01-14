@@ -1,15 +1,16 @@
 <?php
 if (preg_match("/m=getdata/", $params['SOURCE'])) return;
-//========= метод on_off (включение/выключение) ===================
+//========= метод set_mode (смена режима работы) ===================
 $debug=true;
 $debug2file=true;
 include_once(DIR_MODULES.'Yeelight/Yeelight_library.php');
 $Location = $this->getProperty('Location');
 $id = $this->getProperty('id');
-$status = $this->getProperty('status');
+$mode = $this->getProperty('active_mode');
+if ($mode == 0) $mode = 1;
+elseif ($mode == 1) $mode = 5;
 $classname="Yeelight";
-if ($status) {$power = 'on'; }
-if (!$status) {$power = 'off'; }
+$power = 'on';
 $data = [
 "Location" => $Location,
 "id" => $id, 
@@ -17,7 +18,7 @@ $data = [
 $socketFactory = new Factory();
 $bulbFactory = new BulbFactory($socketFactory);
 $bulb = $bulbFactory->create($data);
-$res = $bulb->setPower($power, 'smooth', 1000); //включить/выключить
+$res = $bulb->setPower($power, 'smooth', 1000, $mode); // режим работы
 if($debug)
 {
 debmes("send commant power:" . json_encode($power),$classname);

@@ -496,7 +496,7 @@ class Bulb
      *
      * @return Promise
      */
-    public function setPower($power, $effect, $duration)
+    public function setPower($power, $effect, $duration, $mode = 0)
     {
         $data = [
             'id' => hexdec($this->getId()),
@@ -505,6 +505,7 @@ class Bulb
                 $power,
                 $effect,
                 $duration,
+                $mode,
             ],
         ];
         $this->send($data);

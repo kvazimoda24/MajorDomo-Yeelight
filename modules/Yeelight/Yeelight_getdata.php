@@ -35,7 +35,7 @@ foreach($objects as $obj) {
     ,BulbProperties::bg_hue
     ,BulbProperties::bg_sat
     ,BulbProperties::nl_br
-    //,BulbProperties::active_mode
+    ,BulbProperties::active_mode
     ];    
     echo "<table border=1><tr><td><pre>\n old data:\n";
     foreach ($prop as $p)

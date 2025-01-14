@@ -115,8 +115,8 @@ foreach ($bulbList_prop as $bulb) {
  //получаем из массива bulbList_prop характеристики устройств
  $id = trim($bulb['id']);
  $Location = trim($bulb['Location']);
- $model = trim($bulb['model']); 
- $name =  trim($bulb['name']); 
+ $model = trim($bulb['model']);
+ $name =  trim($bulb['name']);
  $COLOR_MODE = trim($bulb['color_mode']);
  $powerTXT = $bulb['power'];
  if ($powerTXT == "on") { $power = 1; }
@@ -126,20 +126,20 @@ foreach ($bulbList_prop as $bulb) {
  $rgb = dechex($bulb['rgb']);
  $hue = trim($bulb['hue']);
  $sat = trim($bulb['sat']);
- $support = trim($bulb['support']); 
- 
+ $support = trim($bulb['support']);
+
  //получаем список объектов класса
  $objects=getObjectsByClass("Yeelight");
  $searhID = 0;
  foreach($objects as $obj) {
   if ((gg($obj['TITLE'].".id")) == $id){
-   $searhID += 1;   
-  }     
- } 
- if (!$searhID){  
+   $searhID += 1;
+  }
+ }
+ if (!$searhID){
   if ($name) {
    $objName = $name;
-  } 
+  }
 else {
 	$objName = $model."_".$id;
     //$objName = $model."_".$id.rand();
@@ -163,7 +163,7 @@ else {
         }
 		}
 	}
-	
+
 	if($model=="color" || $model=="color1") {$objDescription = array('Цветная лампочка');
 	 $rec = SQLSelectOne("SELECT ID FROM classes WHERE TITLE LIKE '" . DBSafe("Yeelight") . "'");
 		if (!$rec['ID']) {
@@ -223,7 +223,7 @@ else {
 			}
 		}
 	}
- 
+
    if($model=="bslamp" || $model=="bslamp1") {
 	$objDescription = array('Прикроватный ночник');
 	$rec = SQLSelectOne("SELECT ID FROM classes WHERE TITLE LIKE '" . DBSafe("Yeelight") . "'");
@@ -244,7 +244,7 @@ else {
 			}
 		}
 	}
- 
+
     if($model=="lamp" || $model=="lamp1") {
 	$objDescription = array('Настольная лампа');
 	$rec = SQLSelectOne("SELECT ID FROM classes WHERE TITLE LIKE '" . DBSafe("Yeelight") . "'");
@@ -265,7 +265,6 @@ else {
 			}
 		}
 	}
- 
 }
   //addClassObject('Yeelight', $objName); //создаем объект с новым id
   //заполняем классовые свойства объекта
@@ -276,28 +275,28 @@ else {
   setGlobal($objName.".Location",$Location);
   setGlobal($objName.".name",$name);
   setGlobal($objName.".support",$support);
-   
+
   //создаем свойства объекта с учетом специфики ламп
-  if ($model =="stripe" OR $model =="strip" OR $model =="stripe1" OR $model =="strip1") {    
+  if ($model =="stripe" OR $model =="strip" OR $model =="stripe1" OR $model =="strip1") {
    $result = strpos ($support, 'set_rgb');
-   if ($result) {  
+   if ($result) {
     setGlobal($objName.".rgb",$rgb);
    }
-   
+
    $result = strpos ($support, 'set_ct_abx');
    if ($result) {
     setGlobal($objName.".ct",$ct);
    }
-   
+
    $result = strpos ($support, 'set_hsv');
    if ($result) {
     setGlobal($objName.".hue",$hue);
     setGlobal($objName.".sat",$sat);
    }
-  } elseif ($model =="mono") {  }    
+  } elseif ($model =="mono") {  }
  }
 }
-	
+
 }
 
 
@@ -330,7 +329,6 @@ $this->SearchDevices();
 }
 function usual(&$out) {
  $this->admin($out);
- 
 }
 /**
 * Install
@@ -341,20 +339,20 @@ function usual(&$out) {
 */
  function install($data='') {
 	parent::install();
-	
+
 	@include_once(ROOT.'languages/'.$this->name.'_'.SETTINGS_SITE_LANGUAGE.'.php'); //локализация
     @include_once(ROOT.'languages/'.$this->name.'_default'.'.php');
-	SQLExec("UPDATE project_modules SET TITLE='".LANG_YE_APP_TITLE."' WHERE NAME='".$this->name."'"); 
-	
+	SQLExec("UPDATE project_modules SET TITLE='".LANG_YE_APP_TITLE."' WHERE NAME='".$this->name."'");
+
     addClass('Yeelight');
-	
+
 	$method_id=addClassMethod('Yeelight', 'getdata',"require(DIR_MODULES.'Yeelight/Yeelight_getdata.php');");
 	if ($method_id) {
 		$class=SQLSelectOne("SELECT * FROM methods WHERE ID=".$method_id);
 		$class['DESCRIPTION']='Обновить данные';
 		SQLUpdate('methods',$class);
 	}
-	
+
 	$method_id=addClassMethod('Yeelight', 'on_off',"require(DIR_MODULES.'Yeelight/Yeelight_on_off.php');");
 	if ($method_id) {
 		$class=SQLSelectOne("SELECT * FROM methods WHERE ID=".$method_id);
@@ -362,35 +360,41 @@ function usual(&$out) {
 		SQLUpdate('methods',$class);
 	}
 
-	
+	$method_id=addClassMethod('Yeelight', 'set_mode',"require(DIR_MODULES.'Yeelight/Yeelight_set_mode.php');");
+	if ($method_id) {
+		$class=SQLSelectOne("SELECT * FROM methods WHERE ID=".$method_id);
+		$class['DESCRIPTION']='Изменение режима';
+		SQLUpdate('methods',$class);
+	}
+
 	$method_id=addClassMethod('Yeelight', 'set_bright',"require(DIR_MODULES.'Yeelight/Yeelight_set_bright.php');");
 	if ($method_id) {
 		$class=SQLSelectOne("SELECT * FROM methods WHERE ID=".$method_id);
 		$class['DESCRIPTION']='Установить яркость лампочки';
 		SQLUpdate('methods',$class);
 	}
-	
+
 	$method_id=addClassMethod('Yeelight', 'set_name',"require(DIR_MODULES.'Yeelight/Yeelight_set_name.php');");
 	if ($method_id) {
 		$class=SQLSelectOne("SELECT * FROM methods WHERE ID=".$method_id);
 		$class['DESCRIPTION']='Установить имя лампочки';
 		SQLUpdate('methods',$class);
 	}
-	
+
 	$method_id=addClassMethod('Yeelight', 'set_rgb',"require(DIR_MODULES.'Yeelight/Yeelight_set_rgb.php');");
 	if ($method_id) {
 		$class=SQLSelectOne("SELECT * FROM methods WHERE ID=".$method_id);
 		$class['DESCRIPTION']='Установить RGB цвет лампочки';
 		SQLUpdate('methods',$class);
 	}
-	
+
 	$method_id=addClassMethod('Yeelight', 'set_ct',"require(DIR_MODULES.'Yeelight/Yeelight_set_ct.php');");
 	if ($method_id) {
 		$class=SQLSelectOne("SELECT * FROM methods WHERE ID=".$method_id);
 		$class['DESCRIPTION']='Установить цвет лампочки';
 		SQLUpdate('methods',$class);
 	}
-	
+
 	$method_id=addClassMethod('Yeelight', 'set_hsv',"require(DIR_MODULES.'Yeelight/Yeelight_set_hsv.php');");
 	if ($method_id) {
 		$class=SQLSelectOne("SELECT * FROM methods WHERE ID=".$method_id);
@@ -410,15 +414,14 @@ function usual(&$out) {
 					  $property=SQLSelectOne("SELECT * FROM properties WHERE ID=".$prop_id);
 					  $property['ONCHANGE']='on_off';
 					  SQLUpdate('properties',$property);
-				  } 
+				  }
 
 	$prop_id=addClassProperty('Yeelight', 'bright', 0);//#2
 				  if ($prop_id) {
 					  $property=SQLSelectOne("SELECT * FROM properties WHERE ID=".$prop_id);
 					  $property['ONCHANGE']='set_bright';
 					  SQLUpdate('properties',$property);
-				  } 
-
+				  }
 
 	$prop_id=addClassProperty('Yeelight', 'name', 0);//#12
 				  if ($prop_id) {
@@ -450,11 +453,17 @@ function usual(&$out) {
 					  $property=SQLSelectOne("SELECT * FROM properties WHERE ID=".$prop_id);
 					  $property['ONCHANGE']='set_ct';
 					  SQLUpdate('properties',$property);
-				  }	
-				  			  
+				  }
+	$prop_id=addClassProperty('Yeelight', 'active_mode', 0);
+				  if ($prop_id) {
+					  $property=SQLSelectOne("SELECT * FROM properties WHERE ID=".$prop_id);
+					  $property['ONCHANGE']='set_mode';
+					  SQLUpdate('properties',$property);
+				  }
+
 	addClassProperty('Yeelight', 'id', 0); //Создаёт свойство класса и указывает, что необходимо хранить историю значений 0 дней
 	addClassProperty('Yeelight', 'model', 0);
-	addClassProperty('Yeelight', 'Location', 0);				  
+	addClassProperty('Yeelight', 'Location', 0);
 
 	addClassProperty('Yeelight', 'power', 0);//power дублирует статус для обеспечения совместимости
 	addClassProperty('Yeelight', 'main_power', 0);//power дублирует статус для обеспечения совместимости
@@ -471,13 +480,12 @@ function usual(&$out) {
 	addClassProperty('Yeelight', 'bg_hue', 0);
 	addClassProperty('Yeelight', 'bg_sat', 0);
 	addClassProperty('Yeelight', 'nl_br', 0);
-	addClassProperty('Yeelight', 'active_mode', 0);
 
 
 // поиск устрйоств
 $this->SearchDevices();
 }
- 
+
  public function uninstall()
    {
 	  /*
@@ -494,13 +502,13 @@ $this->SearchDevices();
       SQLExec("delete from methods where title = 'set_name'");
       SQLExec("delete from methods where title = 'set_rgb'");
       SQLExec("delete from methods where title = 'set_ct'");
-      SQLExec("delete from methods where title = 'set_hsv'"); 
+      SQLExec("delete from methods where title = 'set_hsv'");
 	    */
       SQLExec("delete from pvalues where property_id in (select id FROM properties where object_id in (select id from objects where class_id = (select id from classes where title = 'Yeelight')))");
       SQLExec("delete from properties where object_id in (select id from objects where class_id = (select id from classes where title = 'Yeelight'))");
       SQLExec("delete from objects where class_id = (select id from classes where title = 'Yeelight')");
       SQLExec("delete from classes where title = 'Yeelight'");
-      
+
       parent::uninstall();
    }
 // --------------------------------------------------------------------
