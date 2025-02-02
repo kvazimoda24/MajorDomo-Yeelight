@@ -1,72 +1,62 @@
 <?
 include_once(DIR_MODULES.'Yeelight/Yeelight_library.php');
-$objects=getObjectsByClass("Yeelight");
-foreach($objects as $obj) {
-    $objName = $obj['TITLE'];
-    $id = gg($objName.".id");
-    $Location = gg($objName.".Location");    
-    $data = [
+$objName = $obj['TITLE'];
+$id = $this->getProperty("id");
+$Location = $this->getProperty("Location");
+$data = [
     "Location" => $Location,
-    "id" => $id, 
-    ];    
-    $socketFactory = new Factory();
-    $bulbFactory = new BulbFactory($socketFactory);
-    $bulb = $bulbFactory->create($data);
-    $prop=[BulbProperties::POWER
-    ,BulbProperties::BRIGHT
-    ,BulbProperties::RGB
-    ,BulbProperties::COLOR_TEMPERATURE
-    ,BulbProperties::HUE
-    ,BulbProperties::SATURATION
-    ,BulbProperties::COLOR_MODE
-    ,BulbProperties::FLOWING
-    //,BulbProperties::DELAY_OFF  
-    ,BulbProperties::FLOW_PARAMS  
-    //,BulbProperties::MUSIC_ON
-    //,BulbProperties::NAME
-    ,'main_power'
-    ,BulbProperties::bg_power
-    ,BulbProperties::bg_flowing
-    ,BulbProperties::bg_flow_params
-    ,BulbProperties::bg_bright
-    ,BulbProperties::bg_rgb
-    ,BulbProperties::bg_ct
-    ,BulbProperties::bg_lmode
-    ,BulbProperties::bg_hue
-    ,BulbProperties::bg_sat
-    ,BulbProperties::nl_br
-    ,BulbProperties::active_mode
-    ];    
-    echo "<table border=1><tr><td><pre>\n old data:\n";
-    foreach ($prop as $p)
-    echo $p." =>".gg($objName.".".$p)."\n";
-
-    $res = $bulb->getProp($prop);    
-    //print_r($res);
-    echo "<td><pre>receive:\n";
-    foreach ($res['result'] as $k => $v)
-    {
-    	echo "[". $prop[$k]."] => ".$v."\n";
-    	$v=trim($v);
-    	if(strlen($v)>0)
-    	{
-    	    sg($objName.".".$prop[$k],$v);
-	    if($prop[$k] == 'main_power')
-	    {
-		if($v =='on')sg($objName.".status",1);
-		if($v =='off')sg($objName.".status",0);
-	    }
-    	}
-    
-    
+    "id" => $id,
+];    
+$socketFactory = new Factory();
+$bulbFactory = new BulbFactory($socketFactory);
+$bulb = $bulbFactory->create($data);
+$prop=[BulbProperties::POWER
+,BulbProperties::BRIGHT
+,BulbProperties::RGB
+,BulbProperties::COLOR_TEMPERATURE
+,BulbProperties::HUE
+,BulbProperties::SATURATION
+,BulbProperties::COLOR_MODE
+,BulbProperties::FLOWING
+//,BulbProperties::DELAY_OFF
+,BulbProperties::FLOW_PARAMS
+//,BulbProperties::MUSIC_ON
+,BulbProperties::NAME
+,'main_power'
+,BulbProperties::bg_power
+,BulbProperties::bg_flowing
+,BulbProperties::bg_flow_params
+,BulbProperties::bg_bright
+,BulbProperties::bg_rgb
+,BulbProperties::bg_ct
+,BulbProperties::bg_lmode
+,BulbProperties::bg_hue
+,BulbProperties::bg_sat
+,BulbProperties::nl_br
+,BulbProperties::active_mode
+];
+echo "<table border=1><tr><td><pre>\n old data:\n";
+foreach ($prop as $p) {
+    echo $p." => ".$this->getProperty($p)."\n";
+}
+$res = $bulb->getProp($prop);
+//print_r($res);
+echo "<td><pre> receive:\n";
+foreach ($res['result'] as $k => $v) {
+    echo "[". $prop[$k]."] => ".$v."\n";
+    $v=trim($v);
+    if(strlen($v)>0) {
+        $this->setProperty($prop[$k], $v);
+        if($prop[$k] == 'main_power') {
+            if($v =='on') $this->setProperty("status",1);
+            if($v =='off') $this->setProperty("status",0);
+        }
     }
-    //echo $objName."\n";
-    echo "<td><pre>";
-    echo "new data:\n";
-    foreach ($prop as $p)
-    echo $p." =>".gg($objName.".".$p)."\n";  
-  }    
-
+}
+echo "<td><pre>";
+echo " new data:\n";
+foreach ($prop as $p)
+    echo $p." => ".$this->getProperty($p)."\n";
 
 /*    
 +1*power | on: smart LED is turned on / off: smart LED is turned off

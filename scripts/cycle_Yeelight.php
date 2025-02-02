@@ -15,7 +15,7 @@ $Yeelight_module->getConfig();
 
 $objects=getObjectsByClass("Yeelight");
 if (!is_array($objects))
-   exit; // no devices added -- no need to run this cycle
+    exit; // no devices added -- no need to run this cycle
 
 echo date("H:i:s") . " running " . basename(__FILE__) . PHP_EOL;
 
@@ -35,60 +35,54 @@ foreach($objects as $obj) {
     $id = gg($objName.".id");
     $Location = gg($objName.".Location");    
     $data = [
-    "Location" => $Location,
-    "id" => $id, 
+        "Location" => $Location,
+        "id" => $id, 
     ];    
     $socketFactory = new Factory();
     $bulbFactory = new BulbFactory($socketFactory);
     $bulbs[$objName] = $bulbFactory->create($data);
     $bulbs[$objName]->setBlocking(false);
 }
-while (1)
-{
-	 if ((time() - $latest_check) >= $check_period) {
-      $latest_check = time();
-      setGlobal((str_replace('.php', '', basename(__FILE__))) . 'Run', time(), 1);
-   }
-////CODE
-foreach($bulbs as $k => $bulb) {       
-		$data=$bulb->recv();
-		if($data)
-		{
-			DebMes("Get from lamp:".json_encode($data),$classname);
-			if($data['method']=='props' && is_array($data['params']))
-			{
-				foreach ($data['params'] as $param => $param_value)
-				{
-					DebMes("sg('".$k.".".$param."','".$param_value."')",$classname);
-					if($param == 'main_power')
-					{
-					if($param_value =='on')sg($k.".status",1);
-					if($param_value =='off')sg($k.".status",0);
-					
-					}
-					sg($k.".".$param,$param_value);
-				}
-		$rcv_count++;	
-		}
-		else {echo "I receive:\n";print_r($data);}
-		}
-}
-		
-////
-  if ($cycle_debug) {
-      if ((time() - $latest_report) >= $report_period) {
-         $latest_report = time();
-         echo date('H:i:s') . " Received messages count = $rcv_count" . PHP_EOL;
-         $rcv_count=0;
-      }
-   }    
-   if (file_exists('./reboot') || isset($_GET['onetime'])) {
-      $db->Disconnect();
-      echo date('H:i:s') . ' Stopping by command REBOOT or ONETIME ' . basename(__FILE__) . PHP_EOL;
-      exit;
-   }
-sleep(1);
+while (1) {
+    if ((time() - $latest_check) >= $check_period) {
+        $latest_check = time();
+        setGlobal((str_replace('.php', '', basename(__FILE__))) . 'Run', time(), 1);
+    }
+    ////CODE
+    foreach($bulbs as $k => $bulb) {
+        $data=$bulb->recv();
+        if($data) {
+            DebMes("Get from lamp:".json_encode($data),$classname);
+            if($data['method']=='props' && is_array($data['params'])) {
+                foreach ($data['params'] as $param => $param_value) {
+                    DebMes("sg('".$k.".".$param."','".$param_value."')",$classname);
+                    if($param == 'main_power') {
+                        if($param_value =='on') sg($k.".status",1);
+                        if($param_value =='off') sg($k.".status",0);
+                    }
+                    sg($k.".".$param,$param_value);
+		    		}
+		          $rcv_count++;	
+            }
+            else {
+                echo "I receive:\n";
+                print_r($data);
+            }
+        }
+    }
+    ////
+    if ($cycle_debug) {
+        if ((time() - $latest_report) >= $report_period) {
+            $latest_report = time();
+            echo date('H:i:s') . " Received messages count = $rcv_count" . PHP_EOL;
+            $rcv_count=0;
+        }
+    }
+    if (file_exists('./reboot') || isset($_GET['onetime'])) {
+        $db->Disconnect();
+        echo date('H:i:s') . ' Stopping by command REBOOT or ONETIME ' . basename(__FILE__) . PHP_EOL;
+        exit;
+    }
+    sleep(1);
 }
 DebMes("Unexpected close of cycle: " . basename(__FILE__));
-
-
