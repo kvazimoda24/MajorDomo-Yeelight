@@ -1,5 +1,5 @@
 <?php
-if (preg_match("/m=getdata/", $params['SOURCE'])) return;
+if (preg_match("/(m=getdata|action=Yeelight)/", $params['SOURCE'])) return;
 //========= метод set_mode (смена режима работы) ===================
 $debug=true;
 $debug2file=true;

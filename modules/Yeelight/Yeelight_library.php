@@ -33,9 +33,9 @@ class YeelightClient
     {
         return $this->client->search();
     }
-	public function search_prop()
+	public function search_prop($bind_ip = false)
     {
-        return $this->client->search_prop();
+        return $this->client->search_prop($bind_ip);
     }
 }
 
@@ -43,10 +43,10 @@ class YeelightClient
 
 class YeelightRawClient
 {
-    const DISCOVERY_RESPONSE = "M-SEARCH * HTTP/1.1\r\n
-        HOST: 239.255.255.250:1982\r\n
-        MAN: \"ssdp:discover\"\r\n
-        ST: wifi_bulb\r\n";
+    const DISCOVERY_RESPONSE = "M-SEARCH * HTTP/1.1\r\n".
+        "HOST: 239.255.255.250:1982\r\n".
+        "MAN: \"ssdp:discover\"\r\n".
+        "ST: wifi_bulb\r\n";
     const MULTICAST_ADDRESS = '239.255.255.250:1982';
     const NO_FLAG = 0;
     const PACKET_LENGTH = 4096;
@@ -60,7 +60,7 @@ class YeelightRawClient
     /**
      * @var int  
      */
-    private $readTimeout;
+    private $readTimeout = 2;
 
     /**
      * @var YeelightSocket
@@ -83,7 +83,6 @@ class YeelightRawClient
     {
         $this->readTimeout = $readTimeout;
         $this->socket = $socket;
-        $this->socket->bind("10.254.252.2");
         $this->bulbFactory = $bulbFactory;
     }
 
@@ -100,6 +99,7 @@ class YeelightRawClient
         $this->socket->setBlocking(false);
         while ($this->socket->selectRead($this->readTimeout)) {
             $data = $this->formatResponse($this->socket->read(self::PACKET_LENGTH));
+            $data = $this->formatResponse($data);
             $bulb = $this->bulbFactory->create($data);
             $this->bulbList[$bulb->getIp()] = $bulb;
         }
@@ -108,17 +108,17 @@ class YeelightRawClient
     }
     
     //=========этот блок - переделка под чтение ВСЕХ свойств========================<
-    public function search_prop()
+    public function search_prop($bind_ip = false)
     {
+        if ($bind_ip && $bind_ip != '0.0.0.0') $this->socket->bind($bind_ip);
         $this->socket->sendTo(self::DISCOVERY_RESPONSE, self::NO_FLAG, self::MULTICAST_ADDRESS);
         $this->socket->setBlocking(false);
         while ($this->socket->selectRead($this->readTimeout)) {
             $data = $this->formatResponse($this->socket->read(self::PACKET_LENGTH));
             $bulb = $this->bulbFactory->create($data);
             $this->bulbList[$bulb->getIp()] = $bulb;
-			$this->bulbListProp[$bulb->getIp()] = $data;			
-        }        
-        
+			$this->bulbListProp[$bulb->getIp()] = $data;
+        }
 		return $this->bulbListProp;
     }
     //===============================================================================>
@@ -132,7 +132,7 @@ class YeelightRawClient
     {
         return array_reduce(explode("\n", trim($data)), function ($carry, $item) {
             $res = explode(':', $item, 2);
-            $carry[trim(reset($res))] = end($res);
+            $carry[trim(reset($res))] = trim(end($res));
 
             return $carry;
         }, []);

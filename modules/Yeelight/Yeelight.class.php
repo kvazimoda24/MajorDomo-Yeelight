@@ -106,11 +106,14 @@ function run() {
 }
 
 public function SearchDevices(){
+	$this->getConfig();
+	$bind_ip = $this->config['YEELIGHT_BIND'];
+	if ($bind_ip == '') $bind_ip = '0.0.0.0';
 	//=======================================
 	//Создание объектов класса
 	//    Поиск устройств
 	$client = new YeelightClient();
-	$bulbList_prop = $client->search_prop();
+	$bulbList_prop = $client->search_prop($bind_ip);
 	foreach ($bulbList_prop as $bulb) {
 		//получаем из массива bulbList_prop характеристики устройств
 		$id = trim($bulb['id']);
@@ -132,167 +135,91 @@ public function SearchDevices(){
 		$objects=getObjectsByClass("Yeelight");
 		$searhID = 0;
 		foreach($objects as $obj) {
-			if ((gg($obj['TITLE'].".id")) == $id){
+			if (gg($obj['TITLE'].".id") == $id){
 				$searhID += 1;
 			}
 		}
-		if (!$searhID){
-			if ($name) {
-				$objName = $name;
-			} else {
-				$objName = $model."_".$id;
-				//$objName = $model."_".$id.rand();
-				if($model =="stripe" OR $model =="strip" OR $model =="stripe1" OR $model =="strip1"){
-					$objDescription = array('Светодиодная лента');
-					$rec = SQLSelectOne("SELECT ID FROM classes WHERE TITLE LIKE '" . DBSafe("Yeelight") . "'");
-					if (!$rec['ID']) {
-						$rec = array();
-						$rec['TITLE'] = $objName;
-						$rec['DESCRIPTION'] = $objDescription;
-						$rec['ID'] = SQLInsert('classes', $rec);
-					}
-					for ($i = 0; $i < count($objName); $i++) {
-						$obj_rec = SQLSelectOne("SELECT ID FROM objects WHERE CLASS_ID='" . $rec['ID'] . "' AND TITLE LIKE '" . DBSafe($objName) . "'");
-						if (!$obj_rec['ID']) {
-							$obj_rec = array();
-							$obj_rec['CLASS_ID'] = $rec['ID'];
-							$obj_rec['TITLE'] = $objName;
-							$obj_rec['DESCRIPTION'] = $objDescription[$i];
-							$obj_rec['ID'] = SQLInsert('objects', $obj_rec);
-						}
-					}
-				}
-				
-				if($model=="color" || $model=="color1") {$objDescription = array('Цветная лампочка');
-					$rec = SQLSelectOne("SELECT ID FROM classes WHERE TITLE LIKE '" . DBSafe("Yeelight") . "'");
-					if (!$rec['ID']) {
-						$rec = array();
-						$rec['TITLE'] = $objName;
-						$rec['DESCRIPTION'] = $objDescription;
-						$rec['ID'] = SQLInsert('classes', $rec);
-					}
-					for ($i = 0; $i < count($objName); $i++) {
-						$obj_rec = SQLSelectOne("SELECT ID FROM objects WHERE CLASS_ID='" . $rec['ID'] . "' AND TITLE LIKE '" . DBSafe($objName) . "'");
-						if (!$obj_rec['ID']) {
-							$obj_rec = array();
-							$obj_rec['CLASS_ID'] = $rec['ID'];
-							$obj_rec['TITLE'] = $objName;
-							$obj_rec['DESCRIPTION'] = $objDescription[$i];
-							$obj_rec['ID'] = SQLInsert('objects', $obj_rec);
-						}
-					}
-				}
-				if($model=="mono" || $model=="mono1") {$objDescription = array('Белая лампочка');
-					$rec = SQLSelectOne("SELECT ID FROM classes WHERE TITLE LIKE '" . DBSafe("Yeelight") . "'");
-					if (!$rec['ID']) {
-						$rec = array();
-						$rec['TITLE'] = $objName;
-						$rec['DESCRIPTION'] = $objDescription;
-						$rec['ID'] = SQLInsert('classes', $rec);
-					}
-					for ($i = 0; $i < count($objName); $i++) {
-						$obj_rec = SQLSelectOne("SELECT ID FROM objects WHERE CLASS_ID='" . $rec['ID'] . "' AND TITLE LIKE '" . DBSafe($objName) . "'");
-						if (!$obj_rec['ID']) {
-							$obj_rec = array();
-							$obj_rec['CLASS_ID'] = $rec['ID'];
-							$obj_rec['TITLE'] = $objName;
-							$obj_rec['DESCRIPTION'] = $objDescription[$i];
-							$obj_rec['ID'] = SQLInsert('objects', $obj_rec);
-						}
-					}
-				}
-				if( in_array($model, array("ceiling", "ceiling1", "ceiling2", "ceiling3", "ceiling4", "ceiling14", "ceila")) ) {
-					$objDescription = array('Потолочный светильник');
-					$rec = SQLSelectOne("SELECT ID FROM classes WHERE TITLE LIKE '" . DBSafe("Yeelight") . "'");
-					if (!$rec['ID']) {
-						$rec = array();
-						$rec['TITLE'] = $objName;
-						$rec['DESCRIPTION'] = $objDescription;
-						$rec['ID'] = SQLInsert('classes', $rec);
-					}
-					for ($i = 0; $i < count($objName); $i++) {
-						$obj_rec = SQLSelectOne("SELECT ID FROM objects WHERE CLASS_ID='" . $rec['ID'] . "' AND TITLE LIKE '" . DBSafe($objName) . "'");
-						if (!$obj_rec['ID']) {
-							$obj_rec = array();
-							$obj_rec['CLASS_ID'] = $rec['ID'];
-							$obj_rec['TITLE'] = $objName;
-							$obj_rec['DESCRIPTION'] = $objDescription[$i];
-							$obj_rec['ID'] = SQLInsert('objects', $obj_rec);
-						}
-					}
-				}
-				
-				if($model=="bslamp" || $model=="bslamp1") {
-					$objDescription = array('Прикроватный ночник');
-					$rec = SQLSelectOne("SELECT ID FROM classes WHERE TITLE LIKE '" . DBSafe("Yeelight") . "'");
-					if (!$rec['ID']) {
-						$rec = array();
-						$rec['TITLE'] = $objName;
-						$rec['DESCRIPTION'] = $objDescription;
-						$rec['ID'] = SQLInsert('classes', $rec);
-					}
-					for ($i = 0; $i < count($objName); $i++) {
-						$obj_rec = SQLSelectOne("SELECT ID FROM objects WHERE CLASS_ID='" . $rec['ID'] . "' AND TITLE LIKE '" . DBSafe($objName) . "'");
-						if (!$obj_rec['ID']) {
-							$obj_rec = array();
-							$obj_rec['CLASS_ID'] = $rec['ID'];
-							$obj_rec['TITLE'] = $objName;
-							$obj_rec['DESCRIPTION'] = $objDescription[$i];
-							$obj_rec['ID'] = SQLInsert('objects', $obj_rec);
-						}
-					}
-				}
-				
-				if($model=="lamp" || $model=="lamp1") {
-					$objDescription = array('Настольная лампа');
-					$rec = SQLSelectOne("SELECT ID FROM classes WHERE TITLE LIKE '" . DBSafe("Yeelight") . "'");
-					if (!$rec['ID']) {
-						$rec = array();
-						$rec['TITLE'] = $objName;
-						$rec['DESCRIPTION'] = $objDescription;
-						$rec['ID'] = SQLInsert('classes', $rec);
-					}
-					for ($i = 0; $i < count($objName); $i++) {
-						$obj_rec = SQLSelectOne("SELECT ID FROM objects WHERE CLASS_ID='" . $rec['ID'] . "' AND TITLE LIKE '" . DBSafe($objName) . "'");
-						if (!$obj_rec['ID']) {
-							$obj_rec = array();
-							$obj_rec['CLASS_ID'] = $rec['ID'];
-							$obj_rec['TITLE'] = $objName;
-							$obj_rec['DESCRIPTION'] = $objDescription[$i];
-							$obj_rec['ID'] = SQLInsert('objects', $obj_rec);
-						}
-					}
-				}
-			}
-			//addClassObject('Yeelight', $objName); //создаем объект с новым id
-			//заполняем классовые свойства объекта
-			setGlobal($objName.".id",$id);
-			setGlobal($objName.".model",$model);
-			setGlobal($objName.".status",$power);
-			setGlobal($objName.".bright",$bright);
-			setGlobal($objName.".Location",$Location);
-			setGlobal($objName.".name",$name);
-			setGlobal($objName.".support",$support);
-			
-			//создаем свойства объекта с учетом специфики ламп
-			if ($model =="stripe" OR $model =="strip" OR $model =="stripe1" OR $model =="strip1") {
-				$result = strpos ($support, 'set_rgb');
-				if ($result) {
-					setGlobal($objName.".rgb",$rgb);
-				}
-				
-				$result = strpos ($support, 'set_ct_abx');
-				if ($result) {
-					setGlobal($objName.".ct",$ct);
-				}
-				
-				$result = strpos ($support, 'set_hsv');
-				if ($result) {
-					setGlobal($objName.".hue",$hue);
-					setGlobal($objName.".sat",$sat);
-				}
-			} elseif ($model =="mono") {  }
+		
+		if ($searhID) continue;
+		if ($name) $objName = 'yeelight_'.$name;
+		else $objName = $model."_".$id;
+		switch($model) {
+			case "stripe":
+			case "strip":
+			case "stripe1":
+			case "strip1":
+				$objDescription = 'Светодиодная лента';
+				break;
+			case "color":
+			case "color1":
+				$objDescription = 'Цветная лампочка';
+				break;
+			case "mono":
+			case "mono1":
+				$objDescription = 'Белая лампочка';
+				break;
+			case "ceiling":
+			case "ceiling1":
+			case "ceiling2":
+			case "ceiling3":
+			case "ceiling4":
+			case "ceiling14":
+			case "ceila":
+				$objDescription = 'Потолочный светильник';
+				break;
+			case "bslamp":
+			case "bslamp1":
+				$objDescription = 'Прикроватный ночник';
+				break;
+			case "lamp":
+			case "lamp1":
+				$objDescription = 'Настольная лампа';
+				break;
 		}
+		$rec = SQLSelectOne("SELECT ID FROM classes WHERE TITLE LIKE '" . DBSafe("Yeelight") . "'");
+		if (!$rec['ID']) {
+			$rec = array();
+			$rec['TITLE'] = $objName;
+			$rec['DESCRIPTION'] = $objDescription;
+			$rec['ID'] = SQLInsert('classes', $rec);
+		}
+		$obj_rec = SQLSelectOne("SELECT ID FROM objects WHERE CLASS_ID='" . $rec['ID'] . "' AND TITLE LIKE '" . DBSafe($objName) . "'");
+		if (!$obj_rec['ID']) {
+			$obj_rec = array();
+			$obj_rec['CLASS_ID'] = $rec['ID'];
+			$obj_rec['TITLE'] = $objName;
+			$obj_rec['DESCRIPTION'] = $objDescription;
+			$obj_rec['ID'] = SQLInsert('objects', $obj_rec);
+		}
+		
+		//addClassObject('Yeelight', $objName); //создаем объект с новым id
+		//заполняем классовые свойства объекта
+		setGlobal($objName.'.id', $id);
+		setGlobal($objName.'.model', $model);
+		setGlobal($objName.'.status', $power);
+		setGlobal($objName.'.bright', $bright);
+		setGlobal($objName.'.Location', $Location);
+		setGlobal($objName.'.name', $name);
+		setGlobal($objName.'.support', $support);
+		
+		//создаем свойства объекта с учетом специфики ламп
+		if ($model =="stripe" OR $model =="strip" OR $model =="stripe1" OR $model =="strip1") {
+			$result = strpos ($support, 'set_rgb');
+			if ($result) {
+				setGlobal($objName.".rgb",$rgb);
+			}
+		
+			$result = strpos ($support, 'set_ct_abx');
+			if ($result) {
+				setGlobal($objName.".ct",$ct);
+			}
+		
+			$result = strpos ($support, 'set_hsv');
+			if ($result) {
+				setGlobal($objName.".hue",$hue);
+				setGlobal($objName.".sat",$sat);
+			}
+		} elseif ($model =="mono") {  }
 	}
 }
 
@@ -304,6 +231,16 @@ public function SearchDevices(){
 * @access public
 */
 function admin(&$out) {
+	$this->getConfig();
+	$out['YEELIGHT_BIND'] = $this->config['YEELIGHT_BIND'];
+	if ($out['YEELIGHT_BIND'] == '') $out['YEELIGHT_BIND'] = '0.0.0.0';
+	if ($this->view_mode == 'update_settings') {
+		$yeelight_bind = filter_var(gr('yeelight_bind'), FILTER_VALIDATE_IP);
+		if(!$yeelight_bind) $this->redirect("?");
+		$this->config['YEELIGHT_BIND'] = $yeelight_bind;
+		$this->saveConfig();
+		$this->redirect("?");
+	}
 	// поиск устрйоств
 	$this->SearchDevices();
 	//получить все найденные устройства и отобразить на странице

@@ -73,7 +73,23 @@
 [#if ERR#]
 <div class="alert alert-error"><#LANG_FILLOUT_REQURED#></div>
 [#endif ERR#]
-
+<form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+	<fieldset>
+		<div class="form-group">
+			<label class="control-label"[#if ERR_YEELIGHT_BIND#] style="color:red;font-weight:bold"[#endif#]>
+				Broadcast IP:
+				(*)
+			</label>
+			<div class="controls"><input type="text" name="yeelight_bind" value="[#YEELIGHT_BIND#]" class="input"></div>
+		</div>
+		<div class="form-actions">
+			<button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_UPDATE#></button>
+			<input type="hidden" name="view_mode" value="update_settings">
+			<input type="hidden" name="mode" value="update">
+		</div>
+	</fieldset>
+</form>
+<br>
 [#if RESULT==""#]
 	<h4><#LANG_YE_APP_NOTFOUND#></h4><br><br><br>
         <center><img src="<#ROOTHTML#>templates/Yeelight/img/NoResults.svg" alt="<#LANG_YE_APP_NOTFOUND#>"></center>
